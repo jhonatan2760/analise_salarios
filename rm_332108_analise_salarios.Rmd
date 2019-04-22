@@ -1,0 +1,115 @@
+---
+title: "Trabalho estatistíca - Análise Salários"
+output: html_notebook
+---
+
+Carregando a base de salários
+
+```{r}
+#Importando lib de leitura para o sistema
+#install.packages("readxl")
+#install.packages("plotly")
+#install.packages("corrgram", dependencies = TRUE)
+library("readxl")
+library(plotly)
+```
+
+```{r}
+#Atribuindo valores para a varáivel que iremos utilizar
+
+salarios <- read_excel("salarios.xlsx")
+summary(salarios)
+
+```
+
+Vamos transformar o tempo de empresa de MESES para ANOS
+E vamos transformar o tempo de experiencia para números inteiros
+```{r}
+salarios$tempoempresa <-  as.integer(salarios$tempoempresa / 12) 
+salarios$experiencia <- as.integer(salarios$experiencia)
+```
+
+Os comandos View e str nos permitem visualizar os dados e suas características. No dataset de salários, conseguimos identificar 654 registos e 7 variáveis para serem analisadas.
+
+```{r}
+#View(salarios)
+str(salarios)
+```
+
+1.	Base
+Reconhecimento da Base: Um descrito do tamanho da base, quantidade de variáveis, formatos, e alguns descritivos ("achados") sobre a base/variáveis.
+
+Na qual temos as relações das variáveis:
+(Quantitativa) Salário (variável continua (medição)
+(Qualitativa) Grau de escolaridade 
+(Qualitativa/(Categorica)) Sexo
+(Quantitativa) Idade
+(Quantitativa) temporaEmpresa
+
+Onde podemos transformar as variáveis tempo empresa de meses para anos, para facilitar nossa análise.
+
+Análise exploratória de dados: Detecção de outliers, gráficos e análise. Correlações entre elas (numéricas e gráficos).
+???	No fechamento desta etapa colocar sobre os outliers (caso tenha) e o uso de Componentes Principais
+
+
+### Análise exploratória de dados:
+
+Com os histogramas podemos identificar a frequência dessas variáveis de maneira mais visual, e assim inferir a distribuição de todas as variaveis. É possível perceber também as observações que são potenciais outliers, a ocorrência de todas as variáveis, a representação dessas informacões de forma visual e um ponto de destaque nos histogramas
+
+```{r}
+
+hist(salarios$salario)
+hist(salarios$tempoempresa)
+hist(salarios$idade)
+hist(salarios$escolaridade)
+hist(salarios$experiencia)
+```
+
+Podemos analisar segmentalmente todas as variáveis do nosso dateset com o boxplot, vendo a distância da média e observações que pode ser outliers.
+```{r}
+boxplot(salarios$salario)
+boxplot(salarios$idade)
+boxplot(salarios$escolaridade)
+boxplot(salarios$tempoempresa)
+```
+
+Fazendo uso da biblioteca plotly para fazermos um histograma da variável salario, que corresponde à soma de todas as outras variáveis. 
+
+```{r}
+plot_ly(x = salarios$salario, type = 'histogram')
+```
+
+Após fazer uma análise genérica dos dados e possíveis outliers, fazemos um comparativo de todas as variáveis separadas por tipo.
+
+(Salario e Tempo de Empresa)
+
+```{r}
+boxplot(salarios$salario ~ salarios$tempoempresa, main='Salario por Tempo de Empresa')
+```
+
+(Salario e Tempo de Empresa)
+```{r}
+boxplot(salarios$salario ~ salarios$experiencia, main = 'Salario por experincia na area')
+```
+
+(Salario e Idade)
+
+```{r}
+boxplot(salarios$salario ~ salarios$idade, main = 'Salario por idade')
+```
+
+Correlação entre variáveis
+
+```{r}
+#remove.packages("corrgram")
+#install.packages('corrgram', dependencies = TRUE)
+#library('corrgram')
+#corrgram(matcor, type="cor", lower.panel = panel.shade, upper.panel = pannel.pie)
+```
+
+### Há outliers? Alguma seleção? Explique?
+Em alguns casos, poderíamos considerar certas observações como outliers, pois analisando os gráficos (boxplots, principalmente) e assim que elas aparentam ser. Mas considerando alguns fatores específicos do dataset, que afetam suas características gerais, resolvemos manter estas observacões com objetivo de preservar diversas categorias e possíveis clusters de vinho, sabendo-se que vinhos têm diversos tipos e caracteristicas especificas. Logo, o que poderíamos rejeitar como outliers na verdade poderia gerar perda de informação relevante, como observações com características específicas para grupos específicos de vinhos. Podemos ver a mesma situação acontecendo tanto com o vinho branco quanto com o vinho tinto.
+
+
+### 2.	 Algoritmos para explicar a variável "salario" 
+
