@@ -176,6 +176,7 @@ salarios$tempoempresa <- remove_outliers(salarios$tempoempresa)
 salarios$escolaridade <- remove_outliers(salarios$escolaridade)
 salarios$experiencia <- remove_outliers(salarios$experiencia)
 ```
+### 2.	 Algoritmos para explicar a variável “salario” 
 
 ### 1. Modelo 1 (Regressão Linear)
 
@@ -198,7 +199,7 @@ sexo, experiencia
 
 Saída do modelo:
 
-
+Identifiquei que a variável resposta tem correlação linear positiva com as variáveis X, Y, Z, ou seja, à medida que elas sobem, o valor do salário aumenta. O mesmo não pode ser dito da variável W.  Segundo a validação do modelo, a precisão chega a N, valor considerado baixo (ou alto).
 
 ```{r}
 salarios$salario_valido <- as.numeric(salarios$salario)
@@ -210,7 +211,6 @@ abline(x$coefficients, col='RED', main ='Salario - Escolaridade')
 
 ```
 
+#Modelo 2:  Árvore de Regressão
 
-
-### 2.	 Algoritmos para explicar a variável “salario” 
 
