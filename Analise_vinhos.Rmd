@@ -1,0 +1,243 @@
+---
+title: "Análise da qualidade de vinhos"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(plotly)
+options("scipen" = 2)
+Vinhos <- read.csv2("BaseWine_Red_e_White2018.csv", row.names=1)
+```
+
+Os comandos View e str nos permitem visualizar os dados e suas características. No dataset de vinhos, conseguimos identificar 6497 registos e 13 variáveis para serem analisados.
+
+```{r}
+#View(Vinhos)
+str(Vinhos)
+```
+
+O summary nos dá um poder de abstração maior, ele fornece informações como média, mediana, valores mínimos e máximos sobre todas as nossas variáveis. Um exemplo encontrado é a variável alcohol, que possui o valor mínimo de 0.9567 e o máximo de 14.9000.
+
+```{r}
+summary(Vinhos)
+```
+
+Adicionamos labels às nossas variáveis para facilitar a identificação e visualização gráfica.
+
+```{r}
+attach(Vinhos)
+attr(Vinhos$fixedacidity, 'label') <- 'acidez fixa'
+attr(Vinhos$volatileacidity, 'label') <- 'acidez volatil'
+attr(Vinhos$citricacid, 'label') <- 'acido citrico'
+attr(Vinhos$residualsugar, 'label') <- 'acucar residual'
+attr(Vinhos$chlorides, 'label') <- 'cloretos'
+attr(Vinhos$freesulfurdioxide, 'label') <- 'dioxido de enxofre livre'
+attr(Vinhos$totalsulfurdioxide, 'label') <- 'dioxido de enxofre total'
+attr(Vinhos$density, 'label') <- 'densidade'
+attr(Vinhos$pH, 'label') <- 'pH'
+attr(Vinhos$sulphates, 'label') <- 'sulfatos'
+attr(Vinhos$alcohol, 'label') <- 'alcool'
+attr(Vinhos$quality, 'label') <- 'qualidade'
+attr(Vinhos$Vinho, 'label') <- 'vinho'
+```
+
+Antes de iniciarmos a análise, temos que verificar a existência de valores inválidos. Por meio da função sapply, que funciona como um loop, vimos que não há dados inválidos na nossa base.
+
+```{r}
+sapply(Vinhos, function(x)all(is.na(x)))
+```
+
+Com a frequência absoluta conseguimos visualizar que grande parte dos nossos dados possuem qualidade entre 5 e 7. Também podemos ver que os vinhos de melhor qualidade são do tipo WHITE. Notamos tambem uma diferença entre as frequências absolutas dos nossos dois tipos de dados.
+
+```{r}
+table(as.factor(Vinhos$quality), Vinhos$Vinho)
+```
+
+Ja com a frequência relativa, podemos observar de maneira mais eficiente a distribuição dos nossos dados, pois assim podemos analisar a porcentagem de ocorrências da qualidade dos vinhos.
+
+```{r}
+prop.table(table(as.factor(Vinhos$quality), Vinhos$Vinho),2)
+```
+
+Separamos os dados por grupos (White e Red) e analisamos a média de todas as nossas variáveis para cada grupo, realçando assim as diferenças entre cada segmento.
+
+```{r}
+attach(Vinhos)
+aggregate(Vinhos,
+          by = list(Vinho),
+          FUN = mean)
+```
+
+Com os histogramas podemos identificar a frequência dessas variáveis de maneira mais visual, e assim inferir a distribuição de todas as variaveis. É possível perceber também as observações que são potenciais outliers, a ocorrência de todas as variáveis, a representação dessas informacões de forma visual e um ponto de destaque nos histogramas.
+
+```{r}
+par (mfrow=c(3,4))
+hist(fixedacidity)
+hist(volatileacidity)
+hist(citricacid )
+hist(residualsugar)
+hist(chlorides)
+hist(freesulfurdioxide)
+hist(totalsulfurdioxide)
+hist(density)
+hist(pH)
+hist(sulphates)
+hist(alcohol)
+hist(quality)
+par (mfrow=c(1,1))
+```
+
+Uma analise probabilística gerando um histograma da variavel Quality, notamos neste caso a visualização baseada em porcentagem.
+```{r}
+hist(quality, col=c("pink"), col.main="darkgray", prob=T)
+```
+
+Fazendo uso da biblioteca plotly para fazermos um histograma da variável volatileacidity, que corresponde à acidez volátil do vinho e um componente dessa bebida que, em dose elevada, origina o aroma que remete ao vinagre. A incidência em excesso é resultado da falta de cuidados durante a vinificação. Nos vinhos velhos, é habitual um toque mais acentuado de acidez volátil.
+Podemos notar em nosso dataset que boa parte da nossa amostra tem uma acidez volátil alta, caracterizando nosso vinho, com aroma e sabor.
+
+```{r}
+plot_ly(x = Vinhos$volatileacidity, type = 'histogram')
+```
+
+Podemos analisar segmentalmente todas as variáveis do nosso dateset com o boxplot, vendo a distância da média e observações que pode ser outliers.
+
+```{r}
+attach(Vinhos)
+par (mfrow=c(3,4))
+boxplot(fixedacidity, main='fixedacidity')
+boxplot(volatileacidity , main='volatileacidity')
+boxplot(citricacid , main='citricacid')
+boxplot(residualsugar, main='residualsugar')
+boxplot(chlorides, main='chlorides')
+boxplot(freesulfurdioxide, main='freesulfurdioxide')
+boxplot(totalsulfurdioxide, main='totalsulfurdioxide')
+boxplot(density, main='density')
+boxplot(pH, main='pH')
+boxplot(sulphates, main='sulphates')
+boxplot(alcohol, main='alcohol')
+boxplot(Vinhos$quality, main='quality')
+par (mfrow=c(1,1))
+```
+
+Após fazer uma análise genérica dos dados e possíveis outliers, fazemos um comparativo de todas as variáveis separadas por tipo de vinho (Red e White).
+```{r}
+boxplot(quality ~ Vinho, main='quality')
+
+boxplot(fixedacidity ~ Vinho, main='fixedacidity',col=c('red','blue'))
+boxplot(volatileacidity ~ Vinho , main='volatileacidity',col=c('red','blue'))
+boxplot(citricacid ~ Vinho, main='citricacid',col=c('red','blue'))
+boxplot(residualsugar ~ Vinho, main='residualsugar',col=c('red','blue'))
+boxplot(chlorides ~ Vinho, main='chlorides',col=c('red','blue'))
+boxplot(freesulfurdioxide ~ Vinho, main='freesulfurdioxide' ,col=c('red','blue'))
+boxplot(totalsulfurdioxide ~ Vinho, main='totalsulfurdioxide',col=c('red','blue'))
+boxplot(density ~ Vinho, main='density',col=c('red','blue'))
+boxplot(pH ~ Vinho, main='pH',col=c('red','blue'))
+boxplot(sulphates ~ Vinho, main='sulphates',col=c('red','blue'))
+boxplot(alcohol ~ Vinho, main='alcohol',col=c('red','blue'))
+
+par (mfrow=c(1,1))
+```
+
+Separamos o nosso dataset em dois, um somente de vinhos brancos e o outro de vinho tinto, para analisar cada um deles individualmente.
+```{r}
+white <- subset(Vinhos, Vinho=="WHITE", select=c(quality,fixedacidity,volatileacidity,citricacid,residualsugar,
+                                                 chlorides,freesulfurdioxide,totalsulfurdioxide,density,pH,
+                                                 sulphates,alcohol))
+
+
+red<- subset(Vinhos, Vinho=="RED", select=c(quality,fixedacidity,volatileacidity,citricacid,residualsugar,
+                                            chlorides,freesulfurdioxide,totalsulfurdioxide,density,pH,
+                                            sulphates,alcohol))
+```
+
+Com este histograma, conseguimos visualizar simultaneamente a frequência da variável volatileacidity. Anteriormente, vimos esta mesma variável sem uma separação por tipo. Agora, é possível visualizar cada uma de suas peculiaridades de acordo com o tipo de vinho. A distinção entre essas características indica que os vinhos nao devem ser analisados em conjunto.
+```{r}
+comparing_hist <- plot_ly(alpha = 0.6) %>% 
+  add_histogram(x = ~red$volatileacidity, type = 'histogram', name='Vinho Tinto' ) %>%
+  add_histogram(x = ~white$volatileacidity, name='Vinho Branco') %>%
+  layout(barmode = 'overlay')
+comparing_hist
+```
+
+Esta variável se refere a um sub-produto da fermentação do vinho, e também é adicionado como agente de protege o vinho contra bactérias de oxidação, podemos notar que os níveis diferem muito de vinho para vinho, pois eles têm maneiras diferentes de serem produzidos desde a etapa de fermentação até o produto final.
+
+```{r}
+attach(Vinhos)
+
+plot(freesulfurdioxide~totalsulfurdioxide)
+plot(freesulfurdioxide~totalsulfurdioxide, pch=1, lwd=3)
+
+plot(freesulfurdioxide~totalsulfurdioxide)
+abline(v=mean(freesulfurdioxide), col="red")
+abline(h=mean(totalsulfurdioxide), col="green")
+```
+
+###Com base na análise exploratória inicial o que fazer?
+Podemos notar, com base nesta análise exploratória de dados (EDA, na sigla em inglês) que não se deve utilizar estes datasets em conjunto, pois mesmo sendo vinhos, ambos sao nitidamente diferentes. Deve-se notar que os níveis de suas caracteristicas diferem entre suas correlações afetando diretamente sua qualidade. Analisar essa base como um todo resultaria em distorções.
+Tratando-se de vinhos, podemos ter características específicas que, isoladas, aparentam ter relação direta com a qualidade, porém determinam subgrupos de vinhos e estilos, que por si só podem compor um determinado grupo de vinhos, com suas qualidades especificas.
+
+Não seria preciso analisar o dataset como um todo, e sim analisá-lo talvez por safra, estilo de vinho, ou caracteristicas em geral.
+
+Uma possibilidade seria utilizar modelos de aprendizagem não supervisionada, ou então para segmentá-los em clusters poderia uma opção interessante.
+
+Seguimos então para a análise em separado do vinho no tipo White.
+```{r}
+white <- subset(Vinhos, Vinho=="WHITE", select=c(quality,fixedacidity,volatileacidity,citricacid,residualsugar,
+                                                 chlorides,freesulfurdioxide,totalsulfurdioxide,density,pH,
+                                                 sulphates,alcohol))
+```
+
+Agora analisamos a qualidade de nosso dataset do tipo vinho White, e notamos como os dados se distribuem de maneira mais normalizada em relacão ao primeiro histograma do dataset completo.
+```{r}
+hist(white$quality)   
+```
+
+Assim como no histograma de tipo vinho branco, no nosso summary também encontramos informações mais precisas e normalizadas.
+```{r}
+summary(white)
+```
+
+Matriz de correlação entre as variáveis do nosso dataset, temos como um bom exemplo a correlação entre a density e a totalsulfurdioxide com valor de 0.5391.
+As correlações são mais bem percebidas de maneira visual.
+
+```{r}
+matcor <- cor(white)
+print(matcor, digits = 2)
+```
+
+Agora utilizamos a mesma matriz de correlação, mas utilizando a biblioteca corrgram, que oferece uma visualização muito mais funcional para analisarmos as correlações.
+
+Um exemplo claro de alta correlação envolve as variáveis residualsugar e density. Poderíamos, a depender da situação (como evitar sobreajuste), remover uma delas de reanalisar o modelo e os novos resultados.
+```{r}
+library(corrgram)
+corrgram(matcor, type = "cor", lower.panel = panel.shade, upper.panel = panel.pie)
+
+panel.cor <- function(x, y, digits=2, prefix ="", cex.cor,
+                      ...)  {
+  usr <- par("usr")
+  on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- cor(x, y , use = "pairwise.complete.obs")
+  txt <- format(c(r, 0.123456789), digits = digits) [1]
+  txt <- paste(prefix, txt, sep = "")
+  if (missing(cex.cor))
+    cex <- 0.8/strwidth(txt)
+
+  text(0.5, 0.5, txt, cex = cex * abs(r))
+}
+
+pairs(white, lower.panel=panel.smooth, upper.panel=panel.cor)
+```
+
+### Há outliers? Alguma seleção? Explique?
+Em alguns casos, poderíamos considerar certas observações como outliers, pois analisando os gráficos (boxplots, principalmente) e assim que elas aparentam ser. Mas considerando alguns fatores específicos do vinho, que afetam suas características gerais, resolvemos manter estas observacões com objetivo de preservar diversas categorias e possíveis clusters de vinho, sabendo-se que vinhos têm diversos tipos e caracteristicas especificas.
+Logo, o que poderíamos rejeitar como outliers na verdade poderia gerar perda de informação relevante, como observações com características específicas para grupos específicos de vinhos.
+Podemos ver a mesma situação acontecendo tanto com o vinho branco quanto com o vinho tinto.
+
+### Há necessidade de aplicarmos Análise de Componentes Principais (PCA)?
+Avaliamos que não é o caso de usarmos esse algoritmo, voltado a identificar as variáveis mais relevantes de um conjunto de dados a partir da relação entre essas características. A componente principal, nesse método estatístico, seria a que mais bem explica a distribuição dos dados. A secundária, a segunda mais importante. E assim sucessivamente, com perda acentuada de relevância a cada nova componente. Nesse dataset, aplicar esse algoritmo resultaria em perda de informação e de características importantes da composição de cada observação. O método visa também a redução do número de variáveis, portanto, não haveria necessidade de ser aplicado ao dataset em análise, com 13 variáveis.
+
+
+
+

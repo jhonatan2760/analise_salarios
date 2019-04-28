@@ -213,4 +213,8 @@ abline(x$coefficients, col='RED', main ='Salario - Escolaridade')
 
 #Modelo 2:  Árvore de Regressão
 
+```{r}
+#Read data file
+
+```
 
