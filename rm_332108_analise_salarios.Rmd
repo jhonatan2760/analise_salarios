@@ -192,7 +192,7 @@ nossa varável resposta salário.
  O objetivo aqui é ajustar (fit) o modelo a partir das características da base de dados em estudo.
 
 qual a variável dependente?
-Salário
+experiencia
 
 quais são as variáveis independentes?
 sexo, experiencia
@@ -212,9 +212,31 @@ abline(x$coefficients, col='RED', main ='Salario - Escolaridade')
 ```
 
 #Modelo 2:  Árvore de Regressão
-
+Algoritmos de árvore são de fácil implementação, utilização e compreensão dos resultados. Esse tipo de modelo tem uma estrutura de não (raiz e folhas, ou pais e filhos) visa separar as observações a partir de regras que separam dois grupos em uma quantidade mínima aceitável. 
+árvore de regressão é usada quando a variável resposta é contínua. 
+Qual a variável dependente? quality
+Quais são as variáveis independentes? As demais. 
+Qualidade do modelo: O modelo de árvore de regressão tem um nível de confiança de 76% para a análise  de salários.
 ```{r}
-#Read data file
+install.packages("party")
+install.packages("rpart")
+install.packages("rpart.plot")
+library(party)
+library(rpart)
+library(rpart.plot)
+
 
 ```
+
+
+#Algoritmos para explicar a variável “salario” : duas categoria
+
+
+
+
+
+#4.	Nesta atividade usamos somente algumas técnicas supervisionadas, 
+a)	quais outras técnicas supervisionadas vocês indicariam como adequadas para esta análise?  
+b)	 e, das técnicas Não Supervisionadas, quais?
+
 
