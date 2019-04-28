@@ -1,85 +1,132 @@
 ---
-title: "Trabalho estatistÌca - An·lise Sal·rios"
+title: "Trabalho estatist√≠ca - An√°lise Sal√°rios"
 output: html_notebook
 ---
 
-Carregando a base de sal·rios
+Carregando a base de sal√°rios
 
 ```{r}
 #Importando lib de leitura para o sistema
 #install.packages("readxl")
 #install.packages("plotly")
 #install.packages("corrgram", dependencies = TRUE)
-library("readxl")
-library(plotly)
+#library("readxl")
+#library(plotly)
 ```
 
 ```{r}
-#Atribuindo valores para a var·ivel que iremos utilizar
+#Atribuindo valores para a var√°ivel que iremos utilizar
 
 salarios <- read_excel("salarios.xlsx")
 summary(salarios)
 
 ```
+Antes de iniciarmos a an√É¬°lise, temos que verificar a exist√™ncia de valores inv√°lidos. Por meio da fun√ß√£o sapply, que funciona como um loop, vimos que n√£o h√° dados inv√°lidos na nossa base.
+
+```{r}
+sapply(salarios, function(x)all(is.na(x)))
+```
 
 Vamos transformar o tempo de empresa de MESES para ANOS
-E vamos transformar o tempo de experiencia para n˙meros inteiros
+E vamos transformar o tempo de experiencia para n√∫meros inteiros
 ```{r}
 salarios$tempoempresa <-  as.integer(salarios$tempoempresa / 12) 
 salarios$experiencia <- as.integer(salarios$experiencia)
 ```
 
-Os comandos View e str nos permitem visualizar os dados e suas caracterÌsticas. No dataset de sal·rios, conseguimos identificar 654 registos e 7 vari·veis para serem analisadas.
+Os comandos View e str nos permitem visualizar os dados e suas caracter√≠sticas. No dataset de sal√°rios, conseguimos identificar 654 registos e 7 vari√°veis para serem analisadas.
 
 ```{r}
 #View(salarios)
 str(salarios)
 ```
+O summary nos d√° um poder de abstra√ß√£o maior, ele fornece informa√ß√µeses como m√©dia, mediana,
+ valores m√≠nimos e m√°ximos sobre todas as nossas vari√°veis.
+ 
+```{r}
+summary(salarios)
+```
+Convertendo a  var√≠avel SEXo para 0 homem - 1 mulher
+
+```{r}
+salarios$sexo[salarios$sexo == 'Masculino'] = 0
+salarios$sexo[salarios$sexo == 'Feminino'] = 1
+```
+
+Adicionando labels a nossas vari√°veis
+
+```{r}
+attach(salarios)
+attr(salarios$salario, 'label') <- 'salario'
+attr(salarios$sexo, 'label') <- 'sexo'
+attr(salarios$tempoempresa, 'label') <- 'tempo empresa'
+attr(salarios$idade, 'label')  <- 'idade'
+attr(salarios$escolaridade, 'label') <- 'escolaridade'
+attr(salarios$experiencia, 'label') <- 'experiencia'
+
+```
 
 1.	Base
-Reconhecimento da Base: Um descrito do tamanho da base, quantidade de vari·veis, formatos, e alguns descritivos ("achados") sobre a base/vari·veis.
+Reconhecimento da Base: Um descrito do tamanho da base, quantidade de vari√°veis, formatos, e alguns descritivos (‚Äúachados‚Äù) sobre a base/vari√°veis.
 
-Na qual temos as relaÁıes das vari·veis:
-(Quantitativa) Sal·rio (vari·vel continua (mediÁ„o)
+Na qual temos as rela√ß√µes das vari√°veis:
+(Quantitativa) Sal√°rio (vari√°vel continua (medi√ß√£o)
 (Qualitativa) Grau de escolaridade 
 (Qualitativa/(Categorica)) Sexo
 (Quantitativa) Idade
 (Quantitativa) temporaEmpresa
 
-Onde podemos transformar as vari·veis tempo empresa de meses para anos, para facilitar nossa an·lise.
+Onde podemos transformar as vari√°veis tempo empresa de meses para anos, para facilitar nossa an√°lise.
 
-An·lise exploratÛria de dados: DetecÁ„o de outliers, gr·ficos e an·lise. CorrelaÁıes entre elas (numÈricas e gr·ficos).
-???	No fechamento desta etapa colocar sobre os outliers (caso tenha) e o uso de Componentes Principais
+An√°lise explorat√≥ria de dados: Detec√ß√£o de outliers, gr√°ficos e an√°lise. Correla√ß√µes entre elas (num√©ricas e gr√°ficos).
+ÔÉ∞	No fechamento desta etapa colocar sobre os outliers (caso tenha) e o uso de Componentes Principais
 
 
-### An·lise exploratÛria de dados:
+### An√°lise explorat√≥ria de dados:
 
-Com os histogramas podemos identificar a frequÍncia dessas vari·veis de maneira mais visual, e assim inferir a distribuiÁ„o de todas as variaveis. … possÌvel perceber tambÈm as observaÁıes que s„o potenciais outliers, a ocorrÍncia de todas as vari·veis, a representaÁ„o dessas informacıes de forma visual e um ponto de destaque nos histogramas
+Com os histogramas podemos identificar a frequ√™ncia dessas vari√°veis de maneira mais visual, e assim inferir a distribui√ß√£o de todas as variaveis. √â poss√≠vel perceber tamb√©m as observa√ß√µes que s√£o potenciais outliers, a ocorr√™ncia de todas as vari√°veis, a representa√ß√£o dessas informac√µes de forma visual e um ponto de destaque nos histogramas
 
 ```{r}
 
-hist(salarios$salario)
-hist(salarios$tempoempresa)
-hist(salarios$idade)
-hist(salarios$escolaridade)
-hist(salarios$experiencia)
+hist(salario)
+hist(tempoempresa)
+hist(idade)
+hist(escolaridade)
+hist(experiencia)
 ```
-
-Podemos analisar segmentalmente todas as vari·veis do nosso dateset com o boxplot, vendo a dist‚ncia da mÈdia e observaÁıes que pode ser outliers.
+### Correla√ß√µes entre vari√°eis continuas
 ```{r}
-boxplot(salarios$salario)
-boxplot(salarios$idade)
-boxplot(salarios$escolaridade)
-boxplot(salarios$tempoempresa)
+pairs(salario ~ tempoempresa + experiencia + idade)
+```
+Agrupando n√≠vel de escolaridade em outra vari√°vel baseada nos intervalos
+da maxima
+
+```{r}
+salarios$nivel_escolaridade <- salarios$escolaridade
+salarios$nivel_escolaridade[escolaridade <= 9] = 0
+salarios$nivel_escolaridade[escolaridade > 9 && escolaridade < 12] = 1
+salarios$nivel_escolaridade[escolaridade >= 12 && escolaridade <= 15] = 2
+salarios$nivel_escolaridade[escolaridade >=  15 ] = 3
+salarios$nivel_escolaridade
 ```
 
-Fazendo uso da biblioteca plotly para fazermos um histograma da vari·vel salario, que corresponde ‡ soma de todas as outras vari·veis. 
+
+
+Podemos analisar segmentalmente todas as vari√°veis do nosso dateset com o boxplot, vendo a dist√¢ncia da m√©dia e observa√ß√µes que pode ser outliers.
+```{r}
+boxplot(salario ~ sexo, main='Box-plot Salario vs Sexo', xlab='Sexo', ylab='Salario')
+boxplot(salario ~ idade, main='Box-plot salario vs idade', xlab='Salario', ylab='Idade')
+boxplot(salario ~ salarios$nivel_escolaridade, main='Box-plot salario vs escolaridade', xlab='Salario',ylab='Escolaridade')
+boxplot(salario ~ tempoempresa, main='Box-plot salario vs tempo  empresa',  ylab='Salario', xlab='Tempo empresa')
+```
+
+Fazendo uso da biblioteca plotly para fazermos um histograma da vari√°vel salario, que corresponde √† soma de todas as outras vari√°veis. 
 
 ```{r}
 plot_ly(x = salarios$salario, type = 'histogram')
 ```
 
-ApÛs fazer uma an·lise genÈrica dos dados e possÌveis outliers, fazemos um comparativo de todas as vari·veis separadas por tipo.
+Ap√≥s fazer uma an√°lise gen√©rica dos dados e poss√≠veis outliers, fazemos um comparativo de todas as vari√°veis separadas por tipo.
 
 (Salario e Tempo de Empresa)
 
@@ -98,18 +145,72 @@ boxplot(salarios$salario ~ salarios$experiencia, main = 'Salario por experincia 
 boxplot(salarios$salario ~ salarios$idade, main = 'Salario por idade')
 ```
 
-CorrelaÁ„o entre vari·veis
+Correla√ß√£o entre vari√°veis
 
 ```{r}
-#remove.packages("corrgram")
-#install.packages('corrgram', dependencies = TRUE)
-#library('corrgram')
-#corrgram(matcor, type="cor", lower.panel = panel.shade, upper.panel = pannel.pie)
+#install.packages("kernlab")
+#remove.packages(corrgram)
+#install.packages(corrgram, dependencies = TRUE)
+library(corrgram)
+corrgram(salarios$salario, type="cor", lower.panel = panel.shade, upper.panel = pannel.pie)
 ```
 
-### H· outliers? Alguma seleÁ„o? Explique?
-Em alguns casos, poderÌamos considerar certas observaÁıes como outliers, pois analisando os gr·ficos (boxplots, principalmente) e assim que elas aparentam ser. Mas considerando alguns fatores especÌficos do dataset, que afetam suas caracterÌsticas gerais, resolvemos manter estas observacıes com objetivo de preservar diversas categorias e possÌveis clusters de vinho, sabendo-se que vinhos tÍm diversos tipos e caracteristicas especificas. Logo, o que poderÌamos rejeitar como outliers na verdade poderia gerar perda de informaÁ„o relevante, como observaÁıes com caracterÌsticas especÌficas para grupos especÌficos de vinhos. Podemos ver a mesma situaÁ„o acontecendo tanto com o vinho branco quanto com o vinho tinto.
+### H√° outliers? Alguma sele√ß√£o? Explique?
+Sim, em alguns casos h√° outliers, quando executo os gr√°ficos de boxplot √© percept√≠vel que temos 
+outliers em diversas vari√°veis.
+N√£o foi necess√°rio utilizar componentes principais
+
+###Remo√ß√£o de outliers
+
+```{r}
+remove_outliers <- function(x, na.rm = TRUE, ...) {
+  qnt <- quantile(x, probs=c(.25, .75), na.rm = na.rm, ...)
+  H <- 1.5 * IQR(x, na.rm = na.rm)
+  y <- x
+  y[x < (qnt[1] - H)] <- NA
+  y[x > (qnt[2] + H)] <- NA
+  y
+}
+salarios$idade <- remove_outliers(salarios$idade)
+salarios$tempoempresa <- remove_outliers(salarios$tempoempresa)
+salarios$escolaridade <- remove_outliers(salarios$escolaridade)
+salarios$experiencia <- remove_outliers(salarios$experiencia)
+```
+
+### 1. Modelo 1 (Regress√£o Linear)
+
+Como observado na nossa correl√ß√£o, a vari√°vel escolaridade influ√™ncia
+nossa var√°vel resposta sal√°rio.
+
+ O que √© regress√£o linear? 
+ Uma an√°lise de regress√£o permite, a partir da coleta de dados, identificar a natureza das rela√ß√µes entre as vari√°veis.
+ A regress√£o linear aborda a rela√ß√£o de apenas uma vari√°vel cont√≠nua de entrada com a vari√°vel resposta.
+ O modelo linear usa uma f√≥rmula simples e centen√°ria para encontrar a reta que melhor representa os dados.
+ O modelo √© Yi = b¬∞ + b¬πXi + vari√¢ncia (desvio padr√£o ao quadrado), sendo Y a vari√°vel resposta, b¬∞ o intercepto e b¬π a inclina√ß√£o
+ Em geral n√£o se conhece os valores de b¬∞, b¬π e da vari√£ncia, que podem ser estimados por meio de dados obtidos por amostras
+ O objetivo aqui √© ajustar (fit) o modelo a partir das caracter√≠sticas da base de dados em estudo.
+
+qual a vari√°vel dependente?
+Sal√°rio
+
+quais s√£o as vari√°veis independentes?
+sexo, experiencia
+
+Sa√≠da do modelo:
 
 
-### 2.	 Algoritmos para explicar a vari·vel "salario" 
+
+```{r}
+salarios$salario_valido <- as.numeric(salarios$salario)
+salarios$escolaridade_valida <- as.numeric(salarios$escolaridade)
+
+plot(salarios$salario_valido ~ salarios$escolaridade_valida)
+x <- lm(salarios$salario_valido ~ salarios$escolaridade_valida)
+abline(x$coefficients, col='RED', main ='Salario - Escolaridade')
+
+```
+
+
+
+### 2.	 Algoritmos para explicar a vari√°vel ‚Äúsalario‚Äù 
 
